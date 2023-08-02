@@ -1,3 +1,4 @@
+import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { todoInput } from "~/types";
@@ -16,6 +17,12 @@ export const todoRouter = createTRPCRouter({
   create: protectedProcedure
     .input(todoInput)
     .mutation(async ({ ctx, input }) => {
+      // Example of throwing an error
+      // throw new TRPCError({
+      //   code: "FORBIDDEN",
+      //   message: "You are not allowed to do this",
+      // });
+
       return ctx.prisma.todo.create({
         data: {
           text: input,

@@ -9,6 +9,22 @@ export default function CreateTodo() {
   const trpc = api.useContext();
 
   const { mutate } = api.todo.create.useMutation({
+    onMutate: (newTodo) => {
+      console.log(
+        "🚀 ~ file: CreateTodo.tsx:14 ~ onMutate: ~ newTodo:",
+        newTodo
+      );
+    },
+    onError: (error, newTodo, context) => {
+      console.log(
+        "🚀 ~ file: CreateTodo.tsx:18 ~ onError: ~ error, newTodo, context",
+        error,
+        newTodo,
+        context
+      );
+
+      toast.error(error.message);
+    },
     onSettled: async () => {
       await trpc.todo.all.invalidate();
     },
