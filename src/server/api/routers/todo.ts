@@ -4,22 +4,13 @@ import { todoInput } from "~/types";
 
 export const todoRouter = createTRPCRouter({
   all: protectedProcedure.query(async ({ ctx }) => {
-    // return ctx.prisma.todo.findMany({
-    //   where: {
-    //     userId: ctx.session.user.id,
-    //   },
-    // });
-
-    return [
-      {
-        id: "1",
-        text: "test",
-        done: false,
-        userId: "1",
-        createdAt: new Date(),
-        updatedAt: new Date(),
+    const todos = await ctx.prisma.todo.findMany({
+      where: {
+        userId: ctx.session.user.id,
       },
-    ];
+    });
+
+    return todos.map(({ id, text, done }) => ({ id, text, done }));
   }),
 
   create: protectedProcedure
