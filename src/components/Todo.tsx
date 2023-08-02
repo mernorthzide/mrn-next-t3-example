@@ -1,3 +1,4 @@
+import { api } from "~/utils/api";
 import type { Todo } from "../types";
 
 type TodoProps = {
@@ -6,6 +7,20 @@ type TodoProps = {
 
 export default function Todo({ todo }: TodoProps) {
   const { id, text, done } = todo;
+
+  const trpc = api.useContext();
+
+  const { mutate: doneMutation } = api.todo.toggle.useMutation({
+    onSettled: async () => {
+      await trpc.todo.all.invalidate();
+    },
+  });
+
+  const { mutate: deleteMutation } = api.todo.delete.useMutation({
+    onSettled: async () => {
+      await trpc.todo.all.invalidate();
+    },
+  });
 
   return (
     <>
@@ -17,12 +32,20 @@ export default function Todo({ todo }: TodoProps) {
             name="done"
             id="done"
             checked={done}
+            onChange={(e) => {
+              doneMutation({ id, done: e.target.checked });
+            }}
           />
           <label htmlFor="done" className="cursor-pointer">
             {text}
           </label>
         </div>
-        <button className="rounded bg-blue-700 px-4 py-1 text-white hover:bg-blue-800 focus:right-4 focus:outline-none">
+        <button
+          className="rounded bg-blue-700 px-4 py-1 text-white hover:bg-blue-800 focus:right-4 focus:outline-none"
+          onClick={() => {
+            deleteMutation(id);
+          }}
+        >
           Delete
         </button>
       </div>
